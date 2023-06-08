@@ -4,7 +4,7 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 
 const axios = require('axios').default;
 
-const BASE_URL = 'https://pixabay.com/api';
+const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '37084690-566054f69b0903988f9ff1e75';
 const ell = {
     galleryEl: document.querySelector('.gallery'),
@@ -40,21 +40,20 @@ function doSearchRequest(e) {
 
 async function fetchSearchingData(searchQuery) {
     const FETCH_URL = `${BASE_URL}?key=${API_KEY}&page=${currentPage}&per_page=40&q=${searchQuery}&image_type=photo&orientation=horizontal&safesearch=true`;
-    // const fetchData = await axios.get(FETCH_URL)
+    const fetchData = await axios.get(FETCH_URL)
+        .then((res) => {
+            return res;
+        });
+
+    // const fetchData = await fetch(FETCH_URL)
+    //     .then((res) => {
+    //         return res.json();
+    //     })
     //     .then((res) => {
     //         return res;
     //     });
-
-    const fetchData = await fetch(FETCH_URL)
-        .then((res) => {
-            return res.json();
-        })
-        .then((res) => {
-            console.log(res);
-            return res;
-        });
     
-    createGalleryOfDataMarkup(fetchData);    
+    createGalleryOfDataMarkup(fetchData.data);    
 }
 
 function createGalleryOfDataMarkup({ hits, totalHits }) {
