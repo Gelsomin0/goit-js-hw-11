@@ -34,6 +34,7 @@
     "posthtml-include": "^1.7.4",
     "process": "^0.11.10",
     "querystring-es3": "^0.2.1",
+    "simplelightbox": "^2.14.1",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "url": "^0.11.0",

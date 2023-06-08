@@ -1,4 +1,7 @@
 import Notiflix from 'notiflix';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
+
 const axios = require('axios').default;
 
 const BASE_URL = 'https://pixabay.com/api';
@@ -15,6 +18,8 @@ ell.searchForm.addEventListener('submit', doSearchRequest);
 ell.loadMoreBtn.addEventListener('click', () => {
     fetchSearchingData(searchQuery);
 });
+
+const lightbox = new SimpleLightbox('.gallery a');
 
 
 function doSearchRequest(e) {
@@ -58,7 +63,9 @@ function createGalleryOfDataMarkup({ hits, totalHits }) {
     const gettedData = hits.map(({ likes, views, downloads, comments, webformatURL, largeImageURL, tags }) => {
         return `
             <div class="photo-card">
-                <img class='image' src="${webformatURL}" alt="${tags}" loading="lazy" />
+                <a href='${largeImageURL}'>
+                    <img class='image' src="${webformatURL}" alt="${tags}" loading="lazy" />
+                </a>
                 <div class="info">
                     <p class="info-item">
                         <b>Likes:</b>
@@ -86,11 +93,11 @@ function createGalleryOfDataMarkup({ hits, totalHits }) {
     currentPage += 1;
 
     let cardsQuantity = ell.galleryEl.querySelectorAll('.photo-card').length;
-    console.log(cardsQuantity);
     
     if (cardsQuantity >= totalHits) {
         Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`);
         ell.loadMoreBtn.classList.remove('js-visible');
     }
-    
+
+    lightbox.refresh();
 }
