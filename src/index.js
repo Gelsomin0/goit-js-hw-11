@@ -8,35 +8,57 @@ const ell = {
     searchForm: document.querySelector('#search-form'),
     loadMoreBtn: document.querySelector('.load-more'),
 }
+let searchQuery = undefined;
+let currentPage = 1;
 
 ell.searchForm.addEventListener('submit', doSearchRequest);
+ell.loadMoreBtn.addEventListener('click', () => {
+    fetchSearchingData(searchQuery);
+});
 
 
 function doSearchRequest(e) {
     e.preventDefault();
 
-    const searchQuery = ell.searchForm.querySelector('[name="searchQuery"]').value;
-
+    searchQuery = ell.searchForm.querySelector('[name="searchQuery"]').value;
+    currentPage = 1;
     ell.galleryEl.innerHTML = '';
+    ell.loadMoreBtn.classList.remove('js-visible');
+
+    if (searchQuery === '') {
+        Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+        return;
+    }
 
     fetchSearchingData(searchQuery);
 }
 
 async function fetchSearchingData(searchQuery) {
-    const FETCH_URL = `${BASE_URL}?key=${API_KEY}&page=1&per_page=10&q=${searchQuery}`;
-    const fetchData = await axios.get(FETCH_URL);
-    const gettedData = createGalleryOfDataMarkup(fetchData.data);
+    const FETCH_URL = `${BASE_URL}?key=${API_KEY}&page=${currentPage}&per_page=40&q=${searchQuery}&image_type=photo&orientation=horizontal&safesearch=true`;
+    const fetchData = await axios.get(FETCH_URL)
+        .then((res) => {
+            return res;
+        });
+    createGalleryOfDataMarkup(fetchData.data);
 
-    ell.galleryEl.insertAdjacentHTML('beforeend', gettedData);
+    
 }
 
-function createGalleryOfDataMarkup({hits, totalHits}) {
-    return hits.map((element) => {
-        const { likes, views, downloads, comments, previewURL } = element;
-        console.log(element);
+function createGalleryOfDataMarkup({ hits, totalHits }) {
+    if (totalHits === 0) {
+        Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+        return;
+    }
+    if (currentPage === 1) {
+        Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);    
+    }
+
+    
+
+    const gettedData = hits.map(({ likes, views, downloads, comments, webformatURL, largeImageURL, tags }) => {
         return `
             <div class="photo-card">
-                <img class='image' src="${previewURL}" alt="" loading="lazy" />
+                <img class='image' src="${webformatURL}" alt="${tags}" loading="lazy" />
                 <div class="info">
                     <p class="info-item">
                         <b>Likes:</b>
@@ -58,4 +80,17 @@ function createGalleryOfDataMarkup({hits, totalHits}) {
             </div>
         `;
     }).join('');
+
+    ell.galleryEl.insertAdjacentHTML('beforeend', gettedData);
+    ell.loadMoreBtn.classList.add('js-visible');
+    currentPage += 1;
+
+    let cardsQuantity = ell.galleryEl.querySelectorAll('.photo-card').length;
+    console.log(cardsQuantity);
+    
+    if (cardsQuantity >= totalHits) {
+        Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`);
+        ell.loadMoreBtn.classList.remove('js-visible');
+    }
+    
 }
