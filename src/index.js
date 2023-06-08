@@ -90,14 +90,20 @@ function createGalleryOfDataMarkup({ hits, totalHits }) {
 
     ell.galleryEl.insertAdjacentHTML('beforeend', gettedData);
     ell.loadMoreBtn.classList.add('js-visible');
-    currentPage += 1;
+
+    lightbox.refresh();
 
     let cardsQuantity = ell.galleryEl.querySelectorAll('.photo-card').length;
-    
     if (cardsQuantity >= totalHits) {
         Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`);
         ell.loadMoreBtn.classList.remove('js-visible');
     }
+    if (currentPage > 1) {
+        window.scrollBy({
+            top: window.innerHeight * 0.8,
+            behavior: 'smooth',
+        });
+    }
 
-    lightbox.refresh();
+    currentPage += 1;
 }
