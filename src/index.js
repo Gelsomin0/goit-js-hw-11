@@ -40,13 +40,21 @@ function doSearchRequest(e) {
 
 async function fetchSearchingData(searchQuery) {
     const FETCH_URL = `${BASE_URL}?key=${API_KEY}&page=${currentPage}&per_page=40&q=${searchQuery}&image_type=photo&orientation=horizontal&safesearch=true`;
-    const fetchData = await axios.get(FETCH_URL)
+    // const fetchData = await axios.get(FETCH_URL)
+    //     .then((res) => {
+    //         return res;
+    //     });
+
+    const fetchData = await fetch(FETCH_URL)
         .then((res) => {
+            return res.json();
+        })
+        .then((res) => {
+            console.log(res);
             return res;
         });
-    createGalleryOfDataMarkup(fetchData.data);
-
     
+    createGalleryOfDataMarkup(fetchData);    
 }
 
 function createGalleryOfDataMarkup({ hits, totalHits }) {
