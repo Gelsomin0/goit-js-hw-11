@@ -45,7 +45,8 @@ async function fetchSearchingData(searchQuery) {
     const fetchData = await axios.get(FETCH_URL)
         .then((res) => {
             return res;
-        });
+        })
+        .catch((err) => errorOfFetch(err));
     
     createGalleryOfDataMarkup(fetchData.data);    
 }
@@ -120,4 +121,8 @@ function upPage() {
     });
 
     ell.upBtn.classList.remove('js-visible');
+}
+
+function errorOfFetch(err) {
+    Notiflix.Notify.failure(err.message);
 }
